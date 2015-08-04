@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+<meta name="robots" content="noindex">
+  <title>Matrix clock</title>
+
+<style>
+canvas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top:0;
+    left:0;
+    background-color: #555;
+}
+</style>
+</head>
+<body>
+  <canvas id="matrixCanvas">У вас не работает canvas</canvas>
+<script>
+var size = 15;
+
+var example = document.getElementById("matrixCanvas");
+var ctx = example.getContext('2d');
+
+var sample = document.createElement('canvas');
+var sampleCtx = sample.getContext('2d');
+
+function refreshSample()
+{
+  sample.width = Math.ceil(example.width / size);
+  sample.height = Math.ceil(example.height / size);
+  
+  //sampleCtx.imageSmoothingEnabled= false;
+  sampleCtx.fillStyle = "black";
+  sampleCtx.fillRect(0, 0, sample.width, sample.height);
+  sampleCtx.font = Math.floor(sample.height/2) + "px Tahoma";
+  sampleCtx.fillStyle = "white";
+  sampleCtx.textAlign = "center";
+  sampleCtx.textBaseline = 'middle';
+  var currentdate = new Date(); 
+  var datetime = currentdate.getHours() + ":"  + currentdate.getMinutes();
+  sampleCtx.fillText(datetime, sample.width/2, sample.height/2); 
+}
+
+var items = {};
+
+setInterval(function()
+{
+    if(example.width != window.innerWidth || example.height != window.innerHeight)
+    {
+        //var imgData = ctx.getImageData(0, 0, 
+        //                               Math.floor(example.width/size)*size,
+        //                               Math.floor(example.height/size)*size);
+        example.width = window.innerWidth;
+        example.height = window.innerHeight;
+                    
+        ctx.fillStyle = "green";
+        ctx.fillRect(0, 0, example.width, example.height);
+
+        //ctx.putImageData(imgData, 0, 0);
+    }
+  
+    refreshSample();  
+  
+    ctx.font = size+ "px Arail";
+    ctx.fillStyle = 'rgba(0,0,0, 0.05)';
+    ctx.fillRect(0, 0, example.width, example.height);
+    
+    for(var i=0; i<Math.ceil(example.width/size); i++)
+    {
+        if(typeof items[i] === 'undefined')
+            items[i] = Math.floor(Math.random()*example.height/size);
+
+        var samplePixel = sampleCtx.getImageData(i, items[i], 1, 1);
+        var d = samplePixel.data;
+        if(0.3*d[0] + 0.59*d[1] + 0.11*d[2] >= 128)
+          ctx.fillStyle = '#19ff19';//"#ffd700";
+        else
+          ctx.fillStyle = "green";
+                
+        var symbol = Math.floor(Math.random() * (0x4DB5 - 0x3400)) + 0x3400;
+        ctx.fillText(String.fromCharCode(symbol),
+                     i*size, items[i]*size,
+                     size, size);
+        items[i]++;
+        
+        if(items[i] > Math.ceil(example.height/size - Math.random() * 6 + 3))
+            items[i] = 0;
+    }
+  var imgData = sampleCtx.getImageData(0, 0, sample.width, sample.height);
+  //ctx.putImageData(imgData, 0, 0);
+}, 30);
+</script>
+</body>
+</html>
