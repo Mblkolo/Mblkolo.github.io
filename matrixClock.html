@@ -34,9 +34,9 @@ function getTime()
   var hours = (currentdate.getHours()).toString();
   var minutes = (currentdate.getMinutes()).toString();
   if(hours.length === 1)
-    hours = " " + hours;
+    hours = "0" + hours;
   if(minutes.length === 1)
-    minutes = " " + minutes;
+    minutes = "0" + minutes;
   
  return hours + ":"  + minutes;
 }
