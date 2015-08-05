@@ -34,11 +34,12 @@ function getTime()
   var hours = (currentdate.getHours()).toString();
   var minutes = (currentdate.getMinutes()).toString();
   if(hours.length === 1)
-    hours = "0" + hours;
+    hours = " " + hours;
   if(minutes.length === 1)
-    minutes = "0" + minutes;
+    minutes = " " + minutes;
   
-  return hours + ":"  + minutes;
+  var datetime = hours + ":"  + minutes;
+  sampleCtx.fillText(datetime, sample.width/2, sample.height/2); 
 }
 
 var latestTime = "";
@@ -49,13 +50,8 @@ function refreshSample(forse)
     return;
   
   latestTime = currentTime;
-  var newWidth = Math.ceil(example.width / size);
-  var newHeight = Math.ceil(example.height / size);
-  if(sample.width != newWidth || sample.height != newHeight )
-  {
-    sample.width = newWidth;
-    sample.height = newHeight;
-  }
+  sample.width = Math.ceil(example.width / size);
+  sample.height = Math.ceil(example.height / size);
   
   sampleCtx.fillStyle = "black";
   sampleCtx.fillRect(0, 0, sample.width, sample.height);
@@ -63,10 +59,8 @@ function refreshSample(forse)
   sampleCtx.fillStyle = "white";
   sampleCtx.textAlign = "center";
   sampleCtx.textBaseline = 'middle';
-  sampleCtx.fillText(currentTime, sample.width/2, sample.height/2); 
+  //sampleCtx.fillText(currentTime, sample.width/2, sample.height/2); 
 }
-
-
 
 var items = {};
 
@@ -89,14 +83,15 @@ setInterval(function()
     ctx.fillStyle = 'rgba(0,0,0, 0.05)';
     ctx.fillRect(0, 0, example.width, example.height);
     
+    var sampleData = sampleCtx.getImageData(0, 0, sample.width, sample.height);
     for(var i=0; i<Math.ceil(example.width/size); i++)
     {
         if(typeof items[i] === 'undefined')
             items[i] = Math.floor(Math.random()*example.height/size);
 
-        var samplePixel = sampleCtx.getImageData(i, items[i], 1, 1);
-        var d = samplePixel.data;
-        if(0.3*d[0] + 0.59*d[1] + 0.11*d[2] >= 128)
+        var d = sampleData.data;
+        var base = (items[i] * sampleData.width + i) * 4;
+        if(0.3*d[base+ 0] + 0.59*d[base + 1] + 0.11*d[base + 2] >= 128)
           ctx.fillStyle = '#19ff19';//"#ffd700";
         else
           ctx.fillStyle = "green";
@@ -110,7 +105,7 @@ setInterval(function()
     }
   //var imgData = sampleCtx.getImageData(0, 0, sample.width, sample.height);
   //ctx.putImageData(imgData, 0, 0);
-}, 30);
+}, 30);   
 </script>
 </body>
 </html>
