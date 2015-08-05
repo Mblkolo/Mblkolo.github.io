@@ -1,3 +1,25 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+
+<meta name="robots" content="noindex">
+  <title>Matrix clock</title>
+
+<style>
+canvas {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top:0;
+    left:0;
+    background-color: #555;
+}
+</style>
+</head>
+<body>
+  <canvas id="matrixCanvas">У вас не работает canvas</canvas>
+<script>
 var size = 15;
 
 var example = document.getElementById("matrixCanvas");
@@ -89,3 +111,6 @@ setInterval(function()
   //var imgData = sampleCtx.getImageData(0, 0, sample.width, sample.height);
   //ctx.putImageData(imgData, 0, 0);
 }, 30);
+</script>
+</body>
+</html>
