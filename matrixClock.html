@@ -38,8 +38,7 @@ function getTime()
   if(minutes.length === 1)
     minutes = " " + minutes;
   
-  var datetime = hours + ":"  + minutes;
-  sampleCtx.fillText(datetime, sample.width/2, sample.height/2); 
+ return hours + ":"  + minutes;
 }
 
 var latestTime = "";
@@ -59,7 +58,7 @@ function refreshSample(forse)
   sampleCtx.fillStyle = "white";
   sampleCtx.textAlign = "center";
   sampleCtx.textBaseline = 'middle';
-  //sampleCtx.fillText(currentTime, sample.width/2, sample.height/2); 
+  sampleCtx.fillText(currentTime, sample.width/2, sample.height/2); 
 }
 
 var items = {};
