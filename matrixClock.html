@@ -87,6 +87,8 @@ function refreshSample(forse) {
 var items = {};
 
 function animationStep() {
+	var startTime = new Date().getTime();
+
     if (example.width != window.innerWidth || example.height != window.innerHeight) {
         example.width = window.innerWidth;
         example.height = window.innerHeight;
@@ -112,6 +114,8 @@ function animationStep() {
 
         var symbol = Math.floor(Math.random() * (0x4DB5 - 0x3400)) + 0x3400;
         ctx.fillText(String.fromCharCode(symbol), i * size, items[i] * size);
+		//ctx.fillRect( i * size, items[i] * size, size, size);
+		//ctx.drawImage( sample, 30, 30, size, size, i * size, items[i] * size, size, size);
         items[i]++;
 
         if (items[i] > Math.ceil(example.height / size - Math.random() * 6 + 3)) items[i] = 0;
@@ -119,11 +123,14 @@ function animationStep() {
     //var imgData = sampleCtx.getImageData(0, 0, sample.width, sample.height);
     //ctx.putImageData(imgData, 0, 0);    
 
+	var timeout = Math.max(0, 30 - ((new Date()).getTime() - startTime));
     setTimeout(function () {
-        requestAnimationFrame(animationStep);
-    }, 30);
+        //requestAnimationFrame(animationStep);
+    		animationStep();
+    }, timeout);
 }
-requestAnimationFrame(animationStep);  
+//requestAnimationFrame(animationStep);  
+animationStep();
 </script>
 </body>
 </html>
