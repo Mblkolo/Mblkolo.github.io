@@ -20,33 +20,6 @@ canvas {
 <body>
   <canvas id="matrixCanvas">У вас не работает canvas</canvas>
 <script>
-
-(function () {
-    // requestAnimationFrame polyfill by Erik Möller. fixes from Paul Irish and Tino Zijdel
-    // MIT license
-    var lastTime = 0;
-    var vendors = ['ms', 'moz', 'webkit', 'o'];
-    for (var x = 0; x < vendors.length && !window.requestAnimationFrame; ++x) {
-        window.requestAnimationFrame = window[vendors[x] + 'RequestAnimationFrame'];
-        window.cancelAnimationFrame = window[vendors[x] + 'CancelAnimationFrame'] || window[vendors[x] + 'CancelRequestAnimationFrame'];
-    }
-
-    if (!window.requestAnimationFrame) window.requestAnimationFrame = function (callback, element) {
-        var currTime = new Date().getTime();
-        var timeToCall = Math.max(0, 16 - (currTime - lastTime));
-        var id = window.setTimeout(function () {
-            callback(currTime + timeToCall);
-        },
-        timeToCall);
-        lastTime = currTime + timeToCall;
-        return id;
-    };
-
-    if (!window.cancelAnimationFrame) window.cancelAnimationFrame = function (id) {
-        clearTimeout(id);
-    };
-}());
-
 var size = 15;
 
 var example = document.getElementById("matrixCanvas");
@@ -54,6 +27,39 @@ var ctx = example.getContext('2d');
 
 var sample = document.createElement('canvas');
 var sampleCtx = sample.getContext('2d');
+
+var symbol = document.createElement('canvas');
+var symbolCtx = symbol.getContext('2d');
+
+var timeSymbol = document.createElement('canvas');
+var timeSymbolCtx = timeSymbol.getContext('2d');
+
+(function () {
+	symbol.width = 30 * size;
+	symbol.height = 30 * size;
+	symbolCtx.fillStyle = "green";
+	symbolCtx.font = size + "px Arail";
+	for(var x=0; x<30; x++)
+		for(var y=0; y<30; y++)
+		{
+		    var s = Math.floor(Math.random() * (0x4DB5 - 0x3400)) + 0x3400;
+			symbolCtx.fillText(String.fromCharCode(s), x * size, y * size + size);
+		}
+}());
+
+(function () {
+	timeSymbol.width = 30 * size;
+	timeSymbol.height = 30 * size;
+	timeSymbolCtx.fillStyle = '#19ff19';
+	timeSymbolCtx.font = size + "px Arail";
+	for(var x=0; x<30; x++)
+		for(var y=0; y<30; y++)
+		{
+		    var s = Math.floor(Math.random() * (0x4DB5 - 0x3400)) + 0x3400;
+			timeSymbolCtx.fillText(String.fromCharCode(s), x * size, y * size + size);
+		}
+}());
+
 
 function getTime() {
     var currentdate = new Date();
@@ -99,7 +105,6 @@ function animationStep() {
         refreshSample(true);
     } else refreshSample();
 
-    ctx.font = size + "px Arail";
     ctx.fillStyle = 'rgba(0,0,0, 0.05)';
     ctx.fillRect(0, 0, example.width, example.height);
 
@@ -109,27 +114,29 @@ function animationStep() {
 
         var d = sampleData.data;
         var base = (items[i] * sampleData.width + i) * 4;
-        if (0.3 * d[base + 0] + 0.59 * d[base + 1] + 0.11 * d[base + 2] >= 128) ctx.fillStyle = '#19ff19'; //"#ffd700";
-        else ctx.fillStyle = "green";
+        var isTime = 0.3 * d[base + 0] + 0.59 * d[base + 1] + 0.11 * d[base + 2] >= 128;
+		
+		var x = Math.floor(Math.random() * 30) * size;
+		var y = Math.floor(Math.random() * 30) * size;		
+		if (isTime) 
+			ctx.drawImage( timeSymbol, x, y, size, size, i * size, items[i] * size, size, size);
+        else 
+			ctx.drawImage( symbol, x, y, size, size, i * size, items[i] * size, size, size);
 
-        var symbol = Math.floor(Math.random() * (0x4DB5 - 0x3400)) + 0x3400;
-        ctx.fillText(String.fromCharCode(symbol), i * size, items[i] * size);
-		//ctx.fillRect( i * size, items[i] * size, size, size);
-		//ctx.drawImage( sample, 30, 30, size, size, i * size, items[i] * size, size, size);
         items[i]++;
 
         if (items[i] > Math.ceil(example.height / size - Math.random() * 6 + 3)) items[i] = 0;
     }
-    //var imgData = sampleCtx.getImageData(0, 0, sample.width, sample.height);
-    //ctx.putImageData(imgData, 0, 0);    
 
-	var timeout = Math.max(0, 30 - ((new Date()).getTime() - startTime));
+	//ctx.drawImage( timeSymbol, 0, 0);
+
+	var nowTime = new Date().getTime();
+	var timeout = Math.max(0, 30 - (nowTime - startTime));
     setTimeout(function () {
-        //requestAnimationFrame(animationStep);
-    		animationStep();
+		//console.log(new Date().getTime() - startTime);
+    	animationStep(nowTime);
     }, timeout);
 }
-//requestAnimationFrame(animationStep);  
 animationStep();
 </script>
 </body>
