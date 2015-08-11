@@ -34,6 +34,11 @@ var symbolCtx = symbol.getContext('2d');
 var timeSymbol = document.createElement('canvas');
 var timeSymbolCtx = timeSymbol.getContext('2d');
 
+var showTime = true;
+example.addEventListener('click', function() {
+	showTime = !showTime;
+	}, false);
+
 (function () {
 	symbol.width = 30 * size;
 	symbol.height = 30 * size;
@@ -119,7 +124,10 @@ function animationStep() {
 		var x = Math.floor(Math.random() * 30) * size;
 		var y = Math.floor(Math.random() * 30) * size;		
 		if (isTime) 
-			ctx.drawImage( timeSymbol, x, y, size, size, i * size, items[i] * size, size, size);
+		{
+			if(showTime)
+				ctx.drawImage( timeSymbol, x, y, size, size, i * size, items[i] * size, size, size);
+		}
         else 
 			ctx.drawImage( symbol, x, y, size, size, i * size, items[i] * size, size, size);
 
@@ -128,12 +136,9 @@ function animationStep() {
         if (items[i] > Math.ceil(example.height / size - Math.random() * 6 + 3)) items[i] = 0;
     }
 
-	//ctx.drawImage( timeSymbol, 0, 0);
-
 	var nowTime = new Date().getTime();
 	var timeout = Math.max(0, 30 - (nowTime - startTime));
     setTimeout(function () {
-		//console.log(new Date().getTime() - startTime);
     	animationStep(nowTime);
     }, timeout);
 }
