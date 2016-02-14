@@ -1,0 +1,51 @@
+<html>
+	<head>
+		<title>Валентинка для любимой ^__^</title>
+	</head>
+	<body style="background-color: black">
+		<canvas id="can" width="500" height="500" style="margin:auto;display: block;">Ксюша, с днём святого Валентина</canvas>
+		<script>
+			var canvas = document.getElementById("can");
+			var cn = canvas.getContext("2d");
+
+			var x, y, rad;
+			var points = [];
+			for(var t=0; t<360; t+=5) {
+			  rad = t*Math.PI/180;
+			  x = (16 * Math.sin(rad)*Math.sin(rad)*Math.sin(rad)) * 15 + 250;
+			  y = -(13 * Math.cos(rad) - 5 * Math.cos(2*rad) - 2 * Math.cos(3*rad) - Math.cos(4*rad) ) * 15 + 220;
+			  points.push({x:x, y:y});
+			}
+
+			cn.strokeStyle = '#ff3333';
+			cn.fillStyle = '#000';
+			cn.fillRect(0, 0, canvas.width, canvas.height);
+
+			function draw(step, length) {
+				var i, p1, p2;
+			  p1 = points[step];
+			  p2 = points[(step+length) % points.length];
+			  cn.beginPath();
+			  cn.moveTo(p1.x, p1.y);
+			  cn.lineTo(p2.x, p2.y);
+			  cn.stroke();
+			  
+			  if(step == points.length - 1 || (step+length) == points.length) {
+				step = 0;
+				length++;
+				cn.fillStyle = 'rgba(0,0,0,0.05)';
+				cn.fillRect(0, 0, canvas.width, canvas.height);
+			  }
+			  
+			  if(length == points.length)
+				length = 1;
+			  
+			  setTimeout(function(){
+				draw(step+1, length);
+			  }, 10);
+			}
+
+			draw(0, 1);
+		</script>
+	</body>
+</html>
