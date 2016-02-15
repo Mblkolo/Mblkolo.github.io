@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <title>Валентинка</title>
+</head>
+<body>
+  <div style="width: 500px; margin: auto; text-align: center">
+	  <h1>Валентинка</h1>
+	  <canvas id="canvas" style="border:1px solid #000000; width: 500px; height:500px">Двойным кликом открывайте</canvas>
+  </div>
+<script>
+var canvas = document.getElementById('canvas');
+var context2d = canvas.getContext('2d');
+canvas.width = 500;
+canvas.height = 500;
+
+var _width = 6;
+var _heidht = 6;
+var _left = -3;
+var _top = -3;
+
+var r1 = 196;
+var g1 = 30;
+var b1 = 58;
+
+var r2 = 255;
+var g2 = 36;
+var b2 = 0;
+
+setInterval(function() {
+
+for(var i=0; i<100; ++i)
+{
+  var x = Math.random() * _width + _left;
+  var y = Math.random() * _heidht + _top;
+  
+  var color = (x * x + (y+0.5 - Math.sqrt(Math.abs(x))) * (y+0.5 - Math.sqrt(Math.abs(x))))/4;
+  color = color*color;
+  var color1 = 1 - color;
+  
+  {
+    context2d.fillStyle = "rgb("+Math.floor(r1*color + r2*color1)+", "+Math.floor(g1*color + g2*color1)+", "+Math.floor(b1*color + b2*color1)+")";
+    context2d.fillRect(x*80 + 250 - 5, -y*80 + 250 -5 , 10, 10);
+
+  }
+}
+}, 100);
+</script>
+</body>
+</html>
