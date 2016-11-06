@@ -49,6 +49,7 @@
 	var key_code_1 = __webpack_require__(2);
 	var canvas = document.getElementById("main_canvas");
 	var context = canvas.getContext("2d");
+	context.fillStyle = "#fff";
 	var Tank = (function () {
 	    function Tank() {
 	        this.xPos = 0;
@@ -67,6 +68,7 @@
 	        this.rotation = 0;
 	        this.rotateLeft = false;
 	        this.rotateRight = false;
+	        this.shot = false;
 	    }
 	    return Turret;
 	}());
@@ -98,29 +100,28 @@
 	var tank = new Tank();
 	tank.xPos = 100;
 	var timeout = 30;
-	setInterval(function () {
-	    var t = timeout / 1000;
-	    var a = 3 - tank.velosity;
-	    if (tank.isRun == false) {
-	        a = -5 * tank.velosity;
-	    }
-	    if (tank.rotateLeft)
-	        tank.rotation += 0.1;
-	    if (tank.rotateRight)
-	        tank.rotation -= 0.1;
-	    if (tank.turret.rotateLeft)
-	        tank.turret.rotation += 0.1;
-	    if (tank.turret.rotateRight)
-	        tank.turret.rotation -= 0.1;
-	    tank.velosity = tank.velosity + a * t;
-	    var deltaPos = tank.velosity + a * t * t / 2;
-	    tank.yPos = tank.yPos + deltaPos * Math.cos(tank.rotation);
-	    tank.xPos = tank.xPos + deltaPos * Math.sin(tank.rotation);
-	    Clear();
-	    DrawTank(tank);
-	}, timeout);
+	//setInterval(() => {
+	//    const t = timeout / 1000;
+	//    let a = 3 - tank.velosity ;
+	//    if (tank.isRun == false) {
+	//        a = - 5*tank.velosity;
+	//    }
+	//    if (tank.rotateLeft)
+	//        tank.rotation += 0.1;
+	//    if (tank.rotateRight)
+	//        tank.rotation -= 0.1;
+	//    if (tank.turret.rotateLeft)
+	//        tank.turret.rotation += 0.1;
+	//    if (tank.turret.rotateRight)
+	//        tank.turret.rotation -= 0.1;
+	//    tank.velosity = tank.velosity + a * t;
+	//    let deltaPos = tank.velosity + a * t * t / 2;
+	//    tank.yPos = tank.yPos + deltaPos * Math.cos(tank.rotation);
+	//    tank.xPos = tank.xPos + deltaPos * Math.sin(tank.rotation);
+	//    Clear();
+	//    DrawTank(tank);
+	//}, timeout);
 	document.addEventListener("keydown", function (e) {
-	    console.log(e.keyCode);
 	    if (e.keyCode === key_code_1.KeyCode.UP_ARROW)
 	        tank.isRun = true;
 	    if (e.keyCode === key_code_1.KeyCode.LEFT_ARROW)
@@ -131,6 +132,8 @@
 	        tank.turret.rotateLeft = true;
 	    if (e.keyCode === key_code_1.KeyCode.KEY_D)
 	        tank.turret.rotateRight = true;
+	    if (e.keyCode === key_code_1.KeyCode.SPACE && e.repeat === false)
+	        tank.turret.shot = true;
 	});
 	document.addEventListener("keyup", function (e) {
 	    if (e.keyCode === key_code_1.KeyCode.UP_ARROW)
@@ -144,7 +147,107 @@
 	    if (e.keyCode === key_code_1.KeyCode.KEY_D)
 	        tank.turret.rotateRight = false;
 	});
-	console.log(context);
+	var tankGroup = 2;
+	var anotherGroup = 1;
+	var world = new p2.World({
+	    gravity: [0, 0]
+	});
+	var tankShape = new p2.Box({ width: 5, height: 10 });
+	var gunpointShape = new p2.Box({ width: 1, height: 7 });
+	tankShape.collisionGroup = tankGroup;
+	var tankBody = new p2.Body({ mass: 1, position: [10, 5] });
+	tankBody.angularDamping = 0.9;
+	tankBody.damping = 0.8;
+	tankBody.addShape(tankShape);
+	tankBody.addShape(gunpointShape, [0, 3.5]);
+	var wallShape = new p2.Box({ width: 50, height: 10 });
+	wallShape.collisionMask = tankGroup | anotherGroup;
+	var wallBody = new p2.Body({ mass: 0, position: [20, 40] });
+	wallBody.addShape(wallShape);
+	var enemyShape = new p2.Box({ width: 5, height: 10 });
+	enemyShape.collisionMask = tankGroup | anotherGroup;
+	var enemyBody = new p2.Body({ mass: 1, position: [100, 50] });
+	enemyBody.angularDamping = 0.9;
+	enemyBody.damping = 0.8;
+	enemyBody.addShape(enemyShape);
+	world.addBody(tankBody);
+	world.addBody(wallBody);
+	world.addBody(enemyBody);
+	var ray = new p2.Ray({
+	    mode: p2.Ray.ANY,
+	    from: [10, 15],
+	    to: [10, 355],
+	});
+	var result = new p2.RaycastResult();
+	var timeStep = 30;
+	setInterval(function () {
+	    world.step(timeStep / 1000);
+	    if (tank.turret.shot) {
+	        tank.turret.shot = false;
+	        tankBody.applyImpulseLocal([-gunpointShape.position[0] * 3, -gunpointShape.position[1] * 3]);
+	        var out = [0, 0];
+	        tankBody.vectorToWorldFrame(out, gunpointShape.position);
+	        ray.from = [out[0] * 3 + tankBody.position[0], out[1] * 3 + tankBody.position[1]];
+	        ray.to = [out[0] * 100 + tankBody.position[0], out[1] * 100 + tankBody.position[1]];
+	        ray.update();
+	        console.log(ray.direction);
+	        result.reset();
+	        if (world.raycast(result, ray)) {
+	            var hitPoint = [0, 0];
+	            result.getHitPoint(hitPoint, ray);
+	            console.log(hitPoint);
+	            result.body.applyImpulse(out); //, hitPoint);
+	        }
+	    }
+	    if (tank.isRun) {
+	        tankBody.applyForceLocal([0, 50]);
+	    }
+	    var rotationForce = 200;
+	    var ratation = (tank.rotateLeft ? -1 : 0) + (tank.rotateRight ? 1 : 0);
+	    tankBody.angularForce = ratation * 100;
+	    if (tank.turret.rotateLeft) {
+	        gunpointShape.angle += Math.PI / 1000 * timeStep;
+	    }
+	    if (tank.turret.rotateRight) {
+	        gunpointShape.angle -= Math.PI / 1000 * timeStep;
+	    }
+	    gunpointShape.position[0] = Math.sin(gunpointShape.angle) * 3.5;
+	    gunpointShape.position[1] = Math.cos(gunpointShape.angle) * 3.5;
+	    var vel = tankBody.velocity;
+	    var v = [0, 0];
+	    tankBody.vectorToLocalFrame(v, vel);
+	    tankBody.applyForceLocal([-v[0] * 10, 0]); //коэффициент бокового сопротивления
+	    //tankBody.applyForceLocal([0, -v[1]]);
+	    Clear();
+	    drawBox(tankBody);
+	    drawBox(wallBody);
+	    drawBox(enemyBody);
+	    drawRay(ray);
+	}, timeStep);
+	var scale = 4;
+	function drawRay(ray) {
+	    context.setTransform(1, 0, 0, 1, 0, 0);
+	    context.beginPath();
+	    context.moveTo(ray.from[0] * scale, ray.from[1] * scale);
+	    context.lineTo(ray.to[0] * scale, ray.to[1] * scale);
+	    context.stroke();
+	}
+	function drawBox(boxBody) {
+	    var pos = boxBody.position;
+	    var angle = -boxBody.angle;
+	    var m = matrix_1.Matrix.Multiply(matrix_1.Matrix.Rotation(angle), matrix_1.Matrix.Translation(pos[0] * scale, pos[1] * scale));
+	    for (var i = 0; i < boxBody.shapes.length; ++i) {
+	        var shape = boxBody.shapes[i];
+	        var width = shape.width;
+	        var height = shape.height;
+	        var m2 = matrix_1.Matrix.Multiply(matrix_1.Matrix.Rotation(shape.angle), matrix_1.Matrix.Translation(shape.position[0] * scale, shape.position[1] * scale));
+	        updateTransform(matrix_1.Matrix.Multiply(m2, m));
+	        context.fillRect(-width / 2 * scale, -height / 2 * scale, width * scale, height * scale);
+	        context.beginPath();
+	        context.rect(-width / 2 * scale, -height / 2 * scale, width * scale, height * scale);
+	        context.stroke();
+	    }
+	}
 
 
 /***/ },
