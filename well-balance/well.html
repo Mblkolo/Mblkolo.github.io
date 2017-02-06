@@ -1,0 +1,111 @@
+﻿<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head>
+    <title>Тетрис-колодец</title>
+    <link href="./styles/well-9.css" rel="stylesheet" />
+    <link rel="icon" href="./favicon.ico" type="image/x-icon">
+    <script src="./js/jquery-2.1.4.min.js"></script>
+    <script src="https://cdn.ravenjs.com/3.9.1/raven.min.js"></script>
+    <script>Raven.config('https://5c6871eba6304601b202f15bf29bb4c0@sentry.io/117139', { stacktrace: true }).install();</script>
+    <script src="./js/route.min.js"></script>
+    <script src="./js/well-9.js"></script>
+</head>
+<body>
+    <div id="main-content">
+        <div class="content center-block loading-page">
+            Загрузка тетриса-колодца...
+        </div>
+    </div>
+
+
+    <script type="text/template" id="start-page-template">
+        <div class="content center-block start-page">
+            <div class="center-block how-play">
+                <p>
+                    Колодец <strong>переворачивается</strong><br />
+                    Ронять фигуры на пол нельзя <br />
+                    Совсем нельзя, хотя... <br/>
+                    Попробуй, чего уж
+                </p>
+
+                <p>
+                    Управлять можно <br/>
+                    <strong>мышкой</strong>, <strong>стрелочками</strong> и <strong>WASD</strong>: <br />
+                    <br />
+                    <strong>Влево</strong>, <strong>A</strong> — двигать влево<br />
+                    <strong>Вправо</strong>, <strong>D</strong> — двигать вправо<br />
+                    <strong>Вверх</strong>, <strong>W</strong> — вращать<br />
+                    <strong>Вниз</strong>, <strong>S</strong> — двигать вниз<br />
+                    <strong>Пробел</strong> — мгновенно опустить<br />
+                    <strong>P</strong> — пауза
+                </p>
+
+                <p>
+                    Очки начисляют за удалённые линии<br />
+
+                    <strong>1</strong> линия — <strong>100</strong> очков<br />
+                    <strong>2</strong> линии — <strong>300</strong> очков<br />
+                    <strong>3</strong> линии — <strong>700</strong> очков<br />
+                    <strong>4</strong> линии — <strong>1500</strong> очков
+                </p>
+
+
+
+            </div>
+            <a href="#play" class="link-button play-button center-block">Играть</a>
+        </div>
+    </script>
+
+    <script type="text/template" id="top100-page-template">
+        <div class="content center-block top-100-page">
+            <a href="#start" class="link-button top-100-back-button">Назад</a>
+            <h3 class="top-100-title">Топ 100</h3>
+            <div class="top-100-preloader"><img class="center-block" src="images/preloader.gif" /></div>
+            <div class="top-100-content">
+                <table class="top-100-table">
+                    <thead>
+                        <tr>
+                            <th></th>
+                            <th></th>
+                            <th>Имя</th>
+                            <th>Счёт</th>
+                        </tr>
+                    </thead>
+                    <tbody></tbody>
+                </table>
+                <a href="#top100" class="link-button center-block top-100-more-button hidden">Больше</a>
+            </div>
+        </div>
+    </script>
+
+    <script type="text/template" id="play-page-template">
+        <div class="content center-block play-page">
+            <a href="#play" class="link-button play-cancel-button">Завершить</a>
+            <a href="#start" class="link-button play-back-button">Назад</a>
+            <a href="#play" class="link-button center-block play-pause-button">Пауза</a>
+            <div style="clear:both"></div>
+            <div class="well-game-field">
+                <canvas id="wellCanvas" class="center-block game-canvas" width="560" height="560">поехали!</canvas>
+                <p class="well-game-scope-area well-game-scope">0</p>
+                <div class="game-over">
+                    <h3 class="game-over-title">Результат</h3>
+                    <div class="game-over-info center-block">
+                        <span class="well-game-scope-content">
+                            <span class="well-game-scope">10500</span>
+                            <img src="images/sync.svg" class="well-game-scope-icon well-game-scope-sync" title="Сохраняю результат" />
+                            <img src="images/check-circle.svg" class="well-game-scope-icon well-game-scope-success" title="Результат сохранён" />
+                            <img src="images/close-circle.svg" class="well-game-scope-icon well-game-scope-fail" title="Что-то пошло не так, разработчик уже в курсе" />
+                        </span>
+                    </div>
+                    <a href="#play" class="link-button center-block play-again-button">Ещё раз</a>
+                </div>
+                <div class="game-pause">
+                    <h3 class="game-pause-title">Пауза</h3>
+                    <img src="images/await.svg" alt="Пауза" class="game-pause-await center-block" />
+                    <a href="#play" class="link-button center-block play-continue-button">Продолжить</a>
+                </div>
+            </div>
+        </div>
+    </script>
+</body>
+</html>

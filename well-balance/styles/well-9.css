@@ -1,0 +1,339 @@
+﻿body {
+    padding: 0;
+    margin: 0;
+    background-color: #fff;
+    font-family: Verdana;
+    font-size: 16px;
+}
+
+html {
+    background-color: #fff;
+}
+
+.center-block {
+    display: block;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+.link-button {
+    display: block;
+    text-decoration: none;
+    color: #FFF;
+    background: #89C4F4;
+    text-transform: uppercase;
+    font-weight: 500;
+    text-align: center;
+}
+
+    .link-button:hover {
+        box-shadow: 2px 2px 4px 0 rgba(50, 50, 50, 0.5), 0 0 4px 0 rgba(50, 50, 50, 0.5);
+    }
+
+    .link-button:active {
+        color: #89C4F4;
+        background: #fff;
+    }
+
+.show {
+    display: block !important;
+}
+
+.hidden {
+    display: none !important;
+}
+
+.invisible {
+    visibility: hidden;
+}
+
+.round-image {
+    overflow: hidden;
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+}
+
+/* Частный код */
+
+.content {
+    background-color: #fff;
+    width: 600px;
+    padding: 16px;
+}
+
+.start-page-user-name{
+    width: 320px;
+    /*height: 80px;*/
+}
+
+.start-page-user-name span {
+    font-size: 16px;
+    line-height: 24px;
+    color: #aaa;
+}
+
+.start-page-user-name input {
+    height: 42px;
+    padding: 0 8px;
+    font-size: 24px;
+    margin-bottom: 18px;
+}
+
+
+.top-100-button {
+    width: 160px;
+    height: 32px;
+    line-height: 32px;
+    margin-right: 0;
+    margin-left: auto;
+}
+
+.top-100-title {
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 32px;
+    line-height: 32px;
+    font-weight: 500;
+    color: #89C4F4;
+    margin: 0;
+}
+
+.top-100-back-button {
+    width: 160px;
+    height: 32px;
+    line-height: 32px;
+}
+
+.top-100-preloader
+{
+    padding-top: 120px;
+    padding-bottom: 120px;
+}
+
+.top-100-more-button {
+    width: 160px;
+    height: 32px;
+    line-height: 32px;
+}
+
+.top-100-table tr td:nth-child(4) {
+    text-align: right;
+}
+
+.top-100-table tr td:nth-child(1) {
+    padding-right:  16px;    
+    text-align: right;
+
+    color:#89C4F4;
+    font-size: 24px;
+}
+
+.top-100-table tr td:nth-child(2) {
+    text-align: left;
+    width: 62px;
+}
+
+.top-100-table tr td:nth-child(3) div {
+    max-width: 200px;
+    overflow: hidden;
+    -ms-text-overflow: ellipsis;
+    -o-text-overflow: ellipsis;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.top-100-table thead th {
+    color:#89C4F4;
+    font-weight: normal;
+    height: 32px;
+    font-size: 24px;
+}
+
+.top-100-table thead th:nth-child(3) {
+    text-align:left;
+}
+
+.top-100-table thead th:nth-child(4) {
+    text-align:right;
+}
+
+.top-100-table tr td{
+    height: 64px;
+    border-bottom:#fff 1px solid;
+    border-top:#fff 1px solid;
+}
+
+.top-100-table tbody tr:hover td{
+    border-bottom:#89C4F4 1px solid;
+    border-top:#89C4F4 1px solid;
+}
+
+
+.top-100-table{
+    table-layout: fixed;
+    padding-top: 32px;
+    border-collapse: separate;
+    border-spacing: 0;
+    padding-bottom: 32px;
+    margin-left: auto;
+    margin-right: auto;
+}
+
+
+.play-button {
+    width: 200px;
+    height: 64px;
+    line-height: 64px;
+    font-size: 32px;
+    margin-bottom: 32px;
+}
+
+.how-play {
+    margin-top: 40px;
+    margin-bottom: 40px;
+    width: 360px;
+    /*background-color: #eee;*/
+}
+
+.play-cancel-button {
+    width: 160px;
+    height: 32px;
+    line-height: 32px;
+    float: right;
+}
+
+.play-back-button {
+    width: 160px;
+    height: 32px;
+    line-height: 32px;
+    float: left;
+}
+
+.play-pause-button {
+    width: 108px;
+    height: 32px;
+    line-height: 32px;
+    float: left;
+}
+
+.play-again-button {
+    width: 160px;
+    height: 48px;
+    line-height: 48px;
+    font-size: 24px;
+}
+
+.well-game-field {
+    position: relative;
+}
+
+.well-game-scope-area {
+    position: absolute;
+    top: 120px;
+    right: 30px;
+    color: #89C4F4;
+    font-size: 32px;
+}
+
+.unsectable {
+    -webkit-user-select: none; /* webkit (safari, chrome) browsers */
+    -moz-user-select: none; /* mozilla browsers */
+    -ms-user-select: none; /* IE10+ */
+    -khtml-user-select: none; /* webkit (konqueror) browsers */
+    -o-user-select: none;
+    user-select: none;
+}
+
+.well-game-scope-icon {
+    position: absolute;
+    top: 9px;
+    right: -38px;
+}
+
+.well-game-scope-sync {
+    animation: spin 1000ms infinite linear;
+    -o-animation: spin 1000ms infinite linear;
+    -ms-animation: spin 1000ms infinite linear;
+    -webkit-animation: spin 1000ms infinite linear;
+    -moz-animation: spin 1000ms infinite linear;
+}
+
+@-webkit-keyframes spin {
+    0%  {-webkit-transform: rotate(0deg);}
+    100% {-webkit-transform: rotate(360deg);}   
+}
+
+.well-game-scope-content {
+    position: relative;
+}
+
+.game-over {
+    position: absolute;
+    width: 240px;
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 120px;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 2px 2px 4px 0 rgba(50, 50, 50, 0.5), 0 0 4px 0 rgba(50, 50, 50, 0.5);
+    padding: 24px;
+}
+
+.game-over-title {
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 32px;
+    line-height: 32px;
+    font-weight: 500;
+    color: #89C4F4;
+    margin: 0;
+}
+
+.game-over-info {
+    line-height: 40px;
+    padding: 40px 0 40px;
+    font-size: 40px;
+    text-align: center;
+}
+
+
+.game-pause {
+    position: absolute;
+    width: 240px;
+    margin: auto;
+    left: 0;
+    right: 0;
+    top: 120px;
+    background-color: rgba(255, 255, 255, 0.9);
+    box-shadow: 2px 2px 4px 0 rgba(50, 50, 50, 0.5), 0 0 4px 0 rgba(50, 50, 50, 0.5);
+    padding: 24px;
+}
+
+.game-pause-title {
+    text-align: center;
+    text-transform: uppercase;
+    font-size: 32px;
+    line-height: 32px;
+    font-weight: 500;
+    color: #89C4F4;
+    margin: 0;
+}
+
+.play-continue-button {
+    width: 200px;
+    height: 48px;
+    line-height: 48px;
+    font-size: 24px;
+}
+
+.game-pause-await {
+    width: 80px;
+    height: 80px;
+    margin-top: 32px;
+    margin-bottom: 32px;
+}
+
+.game-canvas {
+    cursor: pointer;
+}
