@@ -81,13 +81,13 @@
 					x.points = createLeoPoints(sample).sort((a, b) => a.y - b.y);
 				});
 
-				images.push(images[images.length-2]);
+				const isFull = window.location.search == "?full";
+				images.push(images[images.length-(isFull ? 2 : 4)]);
 
 				const canvas = document.getElementById("can");
        			const cn = canvas.getContext("2d");
 
 				let t = -1;
-				const isFull = window.location.search == "?full";
 				let imageNo = isFull ? 0 : 5;
 				setInterval(() => {
 					cn.fillStyle="#fff";
@@ -103,7 +103,7 @@
 						t = -1;
 						imageNo +=1;
 						if(imageNo >= images.length - 1)
-							imageNo -= (isFull ? 2 : 3);
+							imageNo -= (isFull ? 2 : 4);
 					}
 				}, 1);
 			}
