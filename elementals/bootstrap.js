@@ -55,8 +55,8 @@
 /******/ 		"../pkg/elementals_bg.wasm": function() {
 /******/ 			return {
 /******/ 				"./elementals": {
-/******/ 					"__wbg_alert_1e0d59a2f8e0c23b": function(p0i32,p1i32) {
-/******/ 						return installedModules["../pkg/elementals.js"].exports["__wbg_alert_1e0d59a2f8e0c23b"](p0i32,p1i32);
+/******/ 					"__wbg_now_5773a96f9330bba7": function() {
+/******/ 						return installedModules["../pkg/elementals.js"].exports["__wbg_now_5773a96f9330bba7"]();
 /******/ 					},
 /******/ 					"__wbindgen_throw": function(p0i32,p1i32) {
 /******/ 						return installedModules["../pkg/elementals.js"].exports["__wbindgen_throw"](p0i32,p1i32);
@@ -159,7 +159,7 @@
 /******/ 				promises.push(installedWasmModuleData);
 /******/ 			else {
 /******/ 				var importObject = wasmImportObjects[wasmModuleId]();
-/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/elementals_bg.wasm":"4a983d40faa1240bf497"}[wasmModuleId] + ".module.wasm");
+/******/ 				var req = fetch(__webpack_require__.p + "" + {"../pkg/elementals_bg.wasm":"9f31dda9961e8a1cc90d"}[wasmModuleId] + ".module.wasm");
 /******/ 				var promise;
 /******/ 				if(importObject instanceof Promise && typeof WebAssembly.compileStreaming === 'function') {
 /******/ 					promise = Promise.all([WebAssembly.compileStreaming(req), importObject]).then(function(items) {
