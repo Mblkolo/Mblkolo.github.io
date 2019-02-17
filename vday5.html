@@ -1,0 +1,117 @@
+﻿<html>
+  <head>
+    <title>Валентинка для любимой ^__^</title>
+  </head>
+  <body style="background-color: rgb(0, 0, 0)">
+    <canvas
+      id="can"
+      width="500"
+      height="500"
+      style="margin:auto;display: block;"
+      >Ксюша, с днём святого Валентина</canvas
+    >
+    <script>
+      const size = 500;
+      const canvas = document.getElementById("can");
+      const cn = canvas.getContext("2d");
+      const pointCount = 10;
+
+      const colors = [
+        {
+          normal: "rgba(255, 25, 95, 0.3)",
+          fire: "#FF195E"
+        },
+        {
+          normal: "rgba(255, 0, 0, 0.3)",
+          fire: "rgba(255, 0, 0, 1)"
+        },
+        {
+          normal: "rgba(243, 112, 255, 0.3)",
+          fire: "rgba(243, 112, 255, 1)"
+        },
+        {
+          normal: "rgba(255, 175, 249, 0.3)",
+          fire: "#FFAFF9"
+        }
+      ];
+
+      function generate_speed() {
+        const speed = Math.random() * 4 + 0.5;
+        return Math.random() < 0.5 ? speed : -speed;
+      }
+
+      function create_point() {
+        const x = Math.random() * size;
+        const y = Math.random() * size;
+        return {
+          x: x,
+          y: y,
+          x_prev: x,
+          y_prev: y,
+          x_vel: generate_speed(),
+          y_vel: generate_speed(),
+          color: colors[Math.floor(Math.random() * colors.length)]
+        };
+      }
+
+      let points = [];
+
+      let counter = 0;
+      function draw() {
+        counter++;
+        if (counter == 50) {
+          counter = 0;
+          cn.fillStyle = "rgba(0,0,0,0.05)";
+          cn.fillRect(0, 0, canvas.width, canvas.height);
+        }
+
+        cn.lineCap = "round";
+        points.forEach((point, i) => {
+          if (inHeart(point.x, point.y)) {
+            cn.strokeStyle = point.color.fire;
+            cn.lineWidth = 3;
+          } else {
+            cn.strokeStyle = point.color.normal;
+            cn.lineWidth = 2;
+          }
+
+          cn.beginPath();
+          cn.moveTo(point.x_prev, point.y_prev);
+          cn.lineTo(point.x, point.y);
+          cn.stroke();
+        });
+      }
+
+      function inHeart(x, y) {
+        x = (x / size - 0.5) * 4;
+        y = (-y / size + 0.5) * 4;
+        return Math.pow(x * x + y * y - 1, 3) - x * x * y * y * y < 0;
+      }
+
+      function execute() {
+        setInterval(() => {
+          points.forEach(point => {
+            point.x_prev = point.x;
+            point.y_prev = point.y;
+            point.x += point.x_vel;
+            point.y += point.y_vel;
+          });
+
+          points = points.filter(
+            point =>
+              0 <= point.x && point.x < size && 0 <= point.y && point.y < size
+          );
+          while (points.length < pointCount) {
+            points.push(create_point());
+          }
+
+          draw();
+        }, 20);
+      }
+
+      cn.fillStyle = "#000";
+      cn.fillRect(0, 0, canvas.width, canvas.height);
+      execute();
+    </script>
+  </body>
+</html>
