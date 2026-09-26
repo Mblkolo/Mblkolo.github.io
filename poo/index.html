@@ -302,7 +302,7 @@
       </svg>
     </button>
     <div id="title">Поймай какашку!</div>
-    <div id="score"><b id="scoreVal">0</b> / 30</div>
+    <div id="score">Счёт: <b id="scoreVal">0</b></div>
   </div>
 
   <div id="field">
@@ -335,14 +335,14 @@
   <div class="overlay" id="startScreen">
     <div class="big">💩</div>
     <h1>Поймай какашку!</h1>
-    <p>Какашка появляется в одной из клеток. Жми кнопку с той же фигурой, пока она не исчезла. С каждой пойманной — быстрее. Поймай 30 — и ты победил!</p>
+    <p>Какашка появляется в одной из клеток. Жми кнопку с той же фигурой, пока она не исчезла. С каждой пойманной — быстрее. Играем до первой ошибки!</p>
     <button class="cta" id="startBtn">Старт</button>
     <div class="kbd">Клавиатура: 1 2 3 или ← ↓ →</div>
   </div>
 
   <div class="overlay hidden" id="overScreen">
-    <div class="big" id="overEmoji">🤢</div>
-    <h1 id="overTitle">Не поймал!</h1>
+    <div class="big">🤢</div>
+    <h1>Не поймал!</h1>
     <div class="result">Очки<b id="finalScore">0</b></div>
     <div class="best" id="bestScore"></div>
     <button class="cta" id="againBtn">Заново</button>
@@ -412,9 +412,9 @@
     try { localStorage.setItem('poop-best', String(v)); } catch (e) {}
   }
 
-  // ---------- Сложность: ускоряется с каждым успехом до цели ----------
-  const TARGET = 30;
-  const progress = () => Math.min(score / (TARGET - 1), 1);                 // 0 → 1
+  // ---------- Сложность: ускоряется с каждым успехом, к HARD_AT очкам — максимум ----------
+  const HARD_AT = 30;
+  const progress = () => Math.min(score / HARD_AT, 1);                 // 0 → 1
   const windowMs = () => Math.round(1150 - progress() * 750);               // 1150 → 400 мс видна какашка
   const gapMs = () => 550 - progress() * 400 + Math.random() * (200 - progress() * 140); // пауза между
 
@@ -461,34 +461,21 @@
     active = -1;
     score++;
     scoreVal.textContent = score;
-    if (score >= TARGET) { win(); return; }
     goodSound();
     spawnTimer = setTimeout(spawn, gapMs());
   }
 
-  function showResult(isWin) {
+  function showResult() {
     const best = Math.max(getBest(), score);
     setBest(best);
-    $('#overEmoji').textContent = isWin ? '🏆' : '🤢';
-    $('#overTitle').textContent = isWin ? 'Победа!' : 'Не поймал!';
-    $('#finalScore').textContent = score + ' / ' + TARGET;
-    $('#bestScore').textContent = isWin ? 'Все какашки пойманы!'
-      : score >= best && score > 0 ? 'Новый рекорд! 🏆' : 'Рекорд: ' + best;
+    $('#finalScore').textContent = score;
+    $('#bestScore').textContent = score >= best && score > 0 ? 'Новый рекорд! 🏆' : 'Рекорд: ' + best;
 
     setTimeout(() => {
       againBtn.disabled = true;           // защита от случайного тапа
       overScreen.classList.remove('hidden');
       setTimeout(() => (againBtn.disabled = false), 450);
-    }, isWin ? 400 : 650);
-  }
-
-  function win() {
-    running = false;
-    clearTimers();
-    [523, 659, 784, 1047].forEach((f, n) => tone(f, f * 1.01, 0.18, 'triangle', 0.25, n * 0.11));
-    if (navigator.vibrate) navigator.vibrate([60, 40, 60, 40, 120]);
-    cells.forEach((c) => c.classList.add('good'));
-    showResult(true);
+    }, 650);
   }
 
   function fail(i) {
@@ -503,7 +490,7 @@
       cells[i].classList.add('bad');
     }
 
-    showResult(false);
+    showResult();
   }
 
   function start() {
