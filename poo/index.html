@@ -1,0 +1,605 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Поймай какашку!">
+<meta name="theme-color" content="#07060d">
+<title>Поймай какашку!</title>
+<style>
+  :root {
+    --bg: #07060d;
+    --fg: #f2eefe;
+    --muted: #8a83a8;
+    --c-circle: #22e6ff;
+    --c-square: #ff3df2;
+    --c-tri: #b6ff3a;
+    --good: #3dff9a;
+    --bad: #ff3d5a;
+    --btn: min(26vw, 17vh, 130px);
+    --cell: min(28vw, 24vh, 170px);
+  }
+
+  /* --- Никаких выделений, подсветок, прыжков и зума --- */
+  *, *::before, *::after {
+    box-sizing: border-box;
+    -webkit-user-select: none;
+    user-select: none;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    touch-action: manipulation;
+    outline: none;
+  }
+  html, body {
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    overscroll-behavior: none;
+    background: var(--bg);
+    color: var(--fg);
+    font-family: system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  }
+  body {
+    position: fixed;
+    inset: 0;
+    touch-action: none;
+  }
+  button {
+    font: inherit;
+    color: inherit;
+    border: 0;
+    background: none;
+    padding: 0;
+    margin: 0;
+    cursor: pointer;
+  }
+
+  #app {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    flex-direction: column;
+    padding:
+      calc(env(safe-area-inset-top) + 10px)
+      calc(env(safe-area-inset-right) + 14px)
+      calc(env(safe-area-inset-bottom) + 18px)
+      calc(env(safe-area-inset-left) + 14px);
+    background:
+      radial-gradient(ellipse at 50% 110%, rgba(255, 61, 242, .12), transparent 60%),
+      radial-gradient(ellipse at 50% -10%, rgba(34, 230, 255, .10), transparent 55%),
+      var(--bg);
+  }
+
+  /* --- Верхняя панель --- */
+  #top {
+    flex: 0 0 44px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  #fs {
+    flex: 0 0 auto;
+    margin-right: 30px; /* баланс с шириной счёта, чтобы заголовок был по центру */
+    width: 40px;
+    height: 40px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+    color: var(--muted);
+    border: 1px solid rgba(255, 255, 255, .12);
+  }
+  #fs svg { width: 20px; height: 20px; }
+  #title {
+    flex: 1 1 auto;
+    text-align: center;
+    font-size: clamp(18px, 5.5vw, 30px);
+    font-weight: 800;
+    white-space: nowrap;
+    text-shadow: 0 0 10px var(--c-square), 0 0 24px rgba(255, 61, 242, .5);
+  }
+  #score {
+    flex: 0 0 auto;
+    width: 70px;
+    font-size: 14px;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+    letter-spacing: .04em;
+    text-align: right;
+  }
+  #score b { color: var(--fg); font-weight: 700; }
+
+  /* --- Клетки --- */
+  #field {
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: min(4vw, 22px);
+  }
+  .cell {
+    position: relative;
+    width: var(--cell);
+    height: var(--cell);
+    border-radius: 18px;
+    background: rgba(255, 255, 255, .035);
+    border: 2px solid rgba(255, 255, 255, .08);
+    display: grid;
+    place-items: center;
+    overflow: hidden;
+    transition: border-color .15s, box-shadow .15s;
+  }
+  .cell .hint {
+    position: absolute;
+    width: 38%;
+    height: 38%;
+    opacity: .16;
+  }
+  .cell .poop {
+    position: relative;
+    font-size: calc(var(--cell) * .58);
+    line-height: 1;
+    transform: scale(0);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .cell.show .poop {
+    animation: pop .14s ease-out forwards;
+  }
+  .cell .timer {
+    position: absolute;
+    left: 10%;
+    right: 10%;
+    bottom: 8%;
+    height: 4px;
+    border-radius: 2px;
+    background: currentColor;
+    transform-origin: left center;
+    transform: scaleX(0);
+    opacity: .85;
+  }
+  .cell.show .timer {
+    animation: drain var(--win, 1000ms) linear forwards;
+  }
+  .cell.good {
+    border-color: var(--good);
+    box-shadow: 0 0 24px rgba(61, 255, 154, .45), inset 0 0 18px rgba(61, 255, 154, .25);
+  }
+  .cell.bad {
+    border-color: var(--bad);
+    box-shadow: 0 0 28px rgba(255, 61, 90, .6), inset 0 0 22px rgba(255, 61, 90, .3);
+    animation: shake .35s;
+  }
+  .cell.bad .poop { opacity: 1; transform: scale(1); }
+  .cell[data-i="0"] { color: var(--c-circle); }
+  .cell[data-i="1"] { color: var(--c-square); }
+  .cell[data-i="2"] { color: var(--c-tri); }
+
+  @keyframes pop {
+    0%   { transform: scale(.2) rotate(-15deg); opacity: 0; }
+    70%  { transform: scale(1.12) rotate(4deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+  @keyframes drain {
+    from { transform: scaleX(1); }
+    to   { transform: scaleX(0); }
+  }
+  @keyframes shake {
+    0%, 100% { translate: 0 0; }
+    20% { translate: -6px 0; }
+    40% { translate: 6px 0; }
+    60% { translate: -4px 0; }
+    80% { translate: 4px 0; }
+  }
+
+  /* --- Кнопки-фигуры --- */
+  #pad {
+    flex: 0 0 auto;
+    display: flex;
+    justify-content: center;
+    gap: min(5vw, 28px);
+    padding-bottom: 6px;
+  }
+  .key {
+    position: relative;
+    width: var(--btn);
+    height: var(--btn);
+    border-radius: 22px;
+    display: grid;
+    place-items: center;
+    background: rgba(255, 255, 255, .04);
+    border: 2px solid rgba(255, 255, 255, .10);
+    transition: background .12s, box-shadow .12s, border-color .12s;
+  }
+  .key svg {
+    width: 56%;
+    height: 56%;
+    overflow: visible;
+    filter: drop-shadow(0 0 4px currentColor) drop-shadow(0 0 10px currentColor);
+    transition: filter .12s;
+  }
+  .key[data-i="0"] { color: var(--c-circle); }
+  .key[data-i="1"] { color: var(--c-square); }
+  .key[data-i="2"] { color: var(--c-tri); }
+  /* подсветка без изменения размеров — ничего не прыгает */
+  .key.pressed {
+    border-color: currentColor;
+    background: color-mix(in srgb, currentColor 22%, transparent);
+    box-shadow: 0 0 22px currentColor, inset 0 0 22px color-mix(in srgb, currentColor 45%, transparent);
+  }
+  .key.pressed svg {
+    filter: drop-shadow(0 0 6px currentColor) drop-shadow(0 0 18px currentColor) brightness(1.4);
+  }
+  .shape { fill: none; stroke: currentColor; stroke-width: 7; stroke-linejoin: round; }
+
+  /* --- Оверлеи --- */
+  .overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 10;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 18px;
+    padding: 24px;
+    text-align: center;
+    background: rgba(7, 6, 13, .86);
+    backdrop-filter: blur(6px);
+    -webkit-backdrop-filter: blur(6px);
+    transition: opacity .2s;
+  }
+  .overlay.hidden { opacity: 0; pointer-events: none; }
+  .overlay h1 {
+    margin: 0;
+    font-size: clamp(30px, 9vw, 56px);
+    line-height: 1.05;
+    text-shadow: 0 0 12px var(--c-square), 0 0 30px rgba(255, 61, 242, .5);
+  }
+  .overlay .big { font-size: clamp(56px, 18vw, 110px); line-height: 1; }
+  .overlay p {
+    margin: 0;
+    max-width: 360px;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.45;
+  }
+  .overlay .result {
+    font-size: 22px;
+    font-variant-numeric: tabular-nums;
+  }
+  .overlay .result b { font-size: 44px; display: block; color: var(--fg); }
+  .overlay .best { color: var(--muted); font-size: 14px; }
+  .cta {
+    margin-top: 6px;
+    min-width: 200px;
+    padding: 16px 34px;
+    border-radius: 999px;
+    font-size: 20px;
+    font-weight: 700;
+    letter-spacing: .03em;
+    color: var(--bg);
+    background: var(--c-circle);
+    box-shadow: 0 0 18px var(--c-circle), 0 0 44px rgba(34, 230, 255, .4);
+    transition: filter .1s;
+  }
+  .cta:active { filter: brightness(1.25); }
+  .cta:disabled { opacity: .4; }
+  .kbd { font-size: 12px; color: #5d5775; }
+  @media (pointer: coarse) { .kbd { display: none; } }
+</style>
+</head>
+<body>
+<div id="app">
+  <div id="top">
+    <button id="fs" aria-label="Полный экран">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+        <path d="M4 9V4h5M20 9V4h-5M4 15v5h5M20 15v5h-5"/>
+      </svg>
+    </button>
+    <div id="title">Поймай какашку!</div>
+    <div id="score"><b id="scoreVal">0</b> / 30</div>
+  </div>
+
+  <div id="field">
+    <div class="cell" data-i="0">
+      <svg class="hint" viewBox="0 0 100 100"><circle class="shape" cx="50" cy="50" r="42"/></svg>
+      <div class="poop">💩</div><div class="timer"></div>
+    </div>
+    <div class="cell" data-i="1">
+      <svg class="hint" viewBox="0 0 100 100"><rect class="shape" x="10" y="10" width="80" height="80" rx="6"/></svg>
+      <div class="poop">💩</div><div class="timer"></div>
+    </div>
+    <div class="cell" data-i="2">
+      <svg class="hint" viewBox="0 0 100 100"><polygon class="shape" points="50,8 94,88 6,88"/></svg>
+      <div class="poop">💩</div><div class="timer"></div>
+    </div>
+  </div>
+
+  <div id="pad">
+    <button class="key" data-i="0" aria-label="Круг">
+      <svg viewBox="0 0 100 100"><circle class="shape" cx="50" cy="50" r="42"/></svg>
+    </button>
+    <button class="key" data-i="1" aria-label="Квадрат">
+      <svg viewBox="0 0 100 100"><rect class="shape" x="10" y="10" width="80" height="80" rx="6"/></svg>
+    </button>
+    <button class="key" data-i="2" aria-label="Треугольник">
+      <svg viewBox="0 0 100 100"><polygon class="shape" points="50,8 94,88 6,88"/></svg>
+    </button>
+  </div>
+
+  <div class="overlay" id="startScreen">
+    <div class="big">💩</div>
+    <h1>Поймай какашку!</h1>
+    <p>Какашка появляется в одной из клеток. Жми кнопку с той же фигурой, пока она не исчезла. С каждой пойманной — быстрее. Поймай 30 — и ты победил!</p>
+    <button class="cta" id="startBtn">Старт</button>
+    <div class="kbd">Клавиатура: 1 2 3 или ← ↓ →</div>
+  </div>
+
+  <div class="overlay hidden" id="overScreen">
+    <div class="big" id="overEmoji">🤢</div>
+    <h1 id="overTitle">Не поймал!</h1>
+    <div class="result">Очки<b id="finalScore">0</b></div>
+    <div class="best" id="bestScore"></div>
+    <button class="cta" id="againBtn">Заново</button>
+  </div>
+</div>
+
+<script>
+(() => {
+  'use strict';
+
+  const GRACE = 100;           // мс, на сколько можно опоздать
+  const $ = (s) => document.querySelector(s);
+  const cells = [...document.querySelectorAll('.cell')];
+  const keys = [...document.querySelectorAll('.key')];
+  const scoreVal = $('#scoreVal');
+  const startScreen = $('#startScreen');
+  const overScreen = $('#overScreen');
+  const againBtn = $('#againBtn');
+
+  let running = false;
+  let score = 0;
+  let active = -1;             // индекс клетки с какашкой или -1
+  let lastCell = -1;
+  let expireTimer = 0, hideTimer = 0, spawnTimer = 0;
+
+  // ---------- Звук (Web Audio, без файлов) ----------
+  let ac = null;
+  function audio() {
+    if (!ac) {
+      const AC = window.AudioContext || window.webkitAudioContext;
+      if (AC) ac = new AC();
+    }
+    if (ac && ac.state === 'suspended') ac.resume();
+    return ac;
+  }
+  function tone(freq, endFreq, dur, type, vol, delay = 0) {
+    const a = audio();
+    if (!a) return;
+    const t = a.currentTime + delay;
+    const o = a.createOscillator();
+    const g = a.createGain();
+    o.type = type;
+    o.frequency.setValueAtTime(freq, t);
+    o.frequency.exponentialRampToValueAtTime(endFreq, t + dur);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+    o.connect(g).connect(a.destination);
+    o.start(t);
+    o.stop(t + dur + 0.02);
+  }
+  function goodSound() {
+    const base = 660 + Math.min(score, 40) * 8;
+    tone(base, base * 1.5, 0.09, 'triangle', 0.25);
+    tone(base * 1.5, base * 2, 0.08, 'sine', 0.18, 0.06);
+  }
+  function badSound() {
+    tone(220, 55, 0.5, 'sawtooth', 0.3);
+    tone(160, 40, 0.55, 'square', 0.15, 0.05);
+  }
+
+  // ---------- Лучший счёт ----------
+  function getBest() {
+    try { return +localStorage.getItem('poop-best') || 0; } catch (e) { return 0; }
+  }
+  function setBest(v) {
+    try { localStorage.setItem('poop-best', String(v)); } catch (e) {}
+  }
+
+  // ---------- Сложность: ускоряется с каждым успехом до цели ----------
+  const TARGET = 30;
+  const progress = () => Math.min(score / (TARGET - 1), 1);                 // 0 → 1
+  const windowMs = () => Math.round(1150 - progress() * 750);               // 1150 → 400 мс видна какашка
+  const gapMs = () => 550 - progress() * 400 + Math.random() * (200 - progress() * 140); // пауза между
+
+  function clearTimers() {
+    clearTimeout(expireTimer);
+    clearTimeout(hideTimer);
+    clearTimeout(spawnTimer);
+  }
+
+  function resetCells() {
+    cells.forEach((c) => c.classList.remove('show', 'good', 'bad'));
+  }
+
+  function spawn() {
+    if (!running) return;
+    let i = Math.floor(Math.random() * 3);
+    // не слишком часто одна и та же клетка подряд
+    if (i === lastCell && Math.random() < 0.6) i = (i + 1 + Math.floor(Math.random() * 2)) % 3;
+    lastCell = i;
+
+    const win = windowMs();
+    const cell = cells[i];
+    cell.classList.remove('good', 'bad', 'show');
+    cell.style.setProperty('--win', win + 'ms');
+    void cell.offsetWidth;     // перезапуск анимации
+    cell.classList.add('show');
+    active = i;
+
+    hideTimer = setTimeout(() => cell.classList.remove('show'), win);
+    expireTimer = setTimeout(() => fail(i), win + GRACE);
+  }
+
+  function press(i) {
+    flashKey(i);
+    if (!running || active === -1) return;
+    if (i !== active) { fail(active); return; }
+
+    clearTimeout(expireTimer);
+    clearTimeout(hideTimer);
+    const cell = cells[i];
+    cell.classList.remove('show');
+    cell.classList.add('good');
+    setTimeout(() => cell.classList.remove('good'), 180);
+    active = -1;
+    score++;
+    scoreVal.textContent = score;
+    if (score >= TARGET) { win(); return; }
+    goodSound();
+    spawnTimer = setTimeout(spawn, gapMs());
+  }
+
+  function showResult(isWin) {
+    const best = Math.max(getBest(), score);
+    setBest(best);
+    $('#overEmoji').textContent = isWin ? '🏆' : '🤢';
+    $('#overTitle').textContent = isWin ? 'Победа!' : 'Не поймал!';
+    $('#finalScore').textContent = score + ' / ' + TARGET;
+    $('#bestScore').textContent = isWin ? 'Все какашки пойманы!'
+      : score >= best && score > 0 ? 'Новый рекорд! 🏆' : 'Рекорд: ' + best;
+
+    setTimeout(() => {
+      againBtn.disabled = true;           // защита от случайного тапа
+      overScreen.classList.remove('hidden');
+      setTimeout(() => (againBtn.disabled = false), 450);
+    }, isWin ? 400 : 650);
+  }
+
+  function win() {
+    running = false;
+    clearTimers();
+    [523, 659, 784, 1047].forEach((f, n) => tone(f, f * 1.01, 0.18, 'triangle', 0.25, n * 0.11));
+    if (navigator.vibrate) navigator.vibrate([60, 40, 60, 40, 120]);
+    cells.forEach((c) => c.classList.add('good'));
+    showResult(true);
+  }
+
+  function fail(i) {
+    if (!running) return;
+    running = false;
+    clearTimers();
+    active = -1;
+    badSound();
+    if (navigator.vibrate) navigator.vibrate(180);
+    if (i >= 0) {
+      cells[i].classList.remove('show');
+      cells[i].classList.add('bad');
+    }
+
+    showResult(false);
+  }
+
+  function start() {
+    audio();
+    clearTimers();
+    resetCells();
+    score = 0;
+    active = -1;
+    lastCell = -1;
+    scoreVal.textContent = '0';
+    startScreen.classList.add('hidden');
+    overScreen.classList.add('hidden');
+    running = true;
+    spawnTimer = setTimeout(spawn, 700);
+  }
+
+  // ---------- Подсветка кнопок ----------
+  const keyTimers = [0, 0, 0];
+  function flashKey(i) {
+    const k = keys[i];
+    k.classList.add('pressed');
+    clearTimeout(keyTimers[i]);
+    keyTimers[i] = setTimeout(() => k.classList.remove('pressed'), 130);
+  }
+
+  // pointerdown — мгновенная реакция, без задержки клика
+  keys.forEach((k) => {
+    k.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      press(+k.dataset.i);
+    });
+  });
+
+  const keyMap = {
+    Digit1: 0, Numpad1: 0, ArrowLeft: 0, KeyA: 0,
+    Digit2: 1, Numpad2: 1, ArrowDown: 1, ArrowUp: 1, KeyS: 1,
+    Digit3: 2, Numpad3: 2, ArrowRight: 2, KeyD: 2,
+  };
+  document.addEventListener('keydown', (e) => {
+    if (e.repeat) return;
+    if (e.code in keyMap) {
+      e.preventDefault();
+      press(keyMap[e.code]);
+    } else if ((e.code === 'Space' || e.code === 'Enter') && !running) {
+      e.preventDefault();
+      if (!startScreen.classList.contains('hidden')) start();
+      else if (!overScreen.classList.contains('hidden') && !againBtn.disabled) start();
+    }
+  });
+
+  // ---------- Полный экран ----------
+  const root = document.documentElement;
+  const isFs = () => !!(document.fullscreenElement || document.webkitFullscreenElement);
+  function enterFs() {
+    const req = root.requestFullscreen || root.webkitRequestFullscreen;
+    if (req && !isFs()) {
+      try {
+        const p = req.call(root, { navigationUI: 'hide' });
+        if (p && p.catch) p.catch(() => {});
+      } catch (e) {}
+    }
+  }
+  function toggleFs() {
+    if (isFs()) {
+      const exit = document.exitFullscreen || document.webkitExitFullscreen;
+      if (exit) exit.call(document);
+    } else enterFs();
+  }
+  const fsBtn = $('#fs');
+  if (!(root.requestFullscreen || root.webkitRequestFullscreen)) fsBtn.style.visibility = 'hidden';
+  fsBtn.addEventListener('click', toggleFs);
+
+  const isTouch = matchMedia('(pointer: coarse)').matches;
+  $('#startBtn').addEventListener('click', () => {
+    if (isTouch) enterFs();   // на телефоне сразу разворачиваем
+    start();
+  });
+  againBtn.addEventListener('click', start);
+
+  // ---------- Блокируем всё, что может выделять/зумить/скроллить ----------
+  ['contextmenu', 'selectstart', 'dragstart', 'gesturestart', 'gesturechange', 'dblclick']
+    .forEach((ev) => document.addEventListener(ev, (e) => e.preventDefault(), { passive: false }));
+  document.addEventListener('touchmove', (e) => e.preventDefault(), { passive: false });
+  // двойной тап-зум на старых iOS
+  let lastTouch = 0;
+  document.addEventListener('touchend', (e) => {
+    const now = Date.now();
+    if (now - lastTouch < 350 && !e.target.closest('.cta, #fs')) e.preventDefault();
+    lastTouch = now;
+  }, { passive: false });
+
+  // свернули вкладку — игра заканчивается честно
+  document.addEventListener('visibilitychange', () => {
+    if (document.hidden && running) fail(active);
+  });
+})();
+</script>
+</body>
+</html>
