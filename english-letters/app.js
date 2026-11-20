@@ -199,10 +199,11 @@ function renderStart() {
   const box = EL("start-letters");
   box.innerHTML = "";
   pending.letters.forEach(c => {
-    const info = infoOf(c);
     const d = document.createElement("div");
-    d.className = "chip" + (isIntroduced(c) ? "" : " new");
-    d.innerHTML = c + "<small style='font-size:.8rem;font-weight:normal'>" + info.emoji + " " + info.name + "</small>";
+    const fresh = !isIntroduced(c);
+    d.className = "chip" + (fresh ? " new" : "");
+    // название по-русски не показываем: иначе ответ виден ещё до упражнения
+    d.innerHTML = c + (fresh ? "<small style='font-size:.75rem;font-weight:normal'>✨</small>" : "");
     box.appendChild(d);
   });
   EL("start-hint").textContent = pending.letters.some(c => !isIntroduced(c))
