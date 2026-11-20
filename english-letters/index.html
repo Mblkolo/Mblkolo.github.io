@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="theme-color" content="#4d9fff">
+<title>Английские буквы — тренажёр</title>
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- ====== ГЛАВНЫЙ ЭКРАН ====== -->
+<section class="screen active" id="scr-home">
+  <header class="home-top">
+    <h1>🔤 Английские буквы</h1>
+    <button class="icon-btn" id="btn-mute" title="Звук вкл/выкл">🔊</button>
+  </header>
+
+  <div class="stats-row">
+    <div class="stat"><b id="st-intro">0</b><span>букв изучено</span></div>
+    <div class="stat"><b id="st-streak">0</b><span>дней подряд</span></div>
+    <div class="stat"><b id="st-today">0</b><span>занятий сегодня</span></div>
+  </div>
+
+  <p class="next-line" id="next-line"></p>
+
+  <h2 class="section-title">Новое упражнение</h2>
+  <div class="grid-3">
+    <button class="mode-btn blue"   data-mode="mixed">🔀<span>Смешанно</span><small>буква ↔ звук</small></button>
+    <button class="mode-btn green"  data-mode="read">👁️<span>Читаю</span><small>буква → название</small></button>
+    <button class="mode-btn orange" data-mode="write">✍️<span>Пишу</span><small>звук → буква</small></button>
+  </div>
+
+  <div class="home-buttons">
+    <button class="btn big yellow" id="btn-browse">🃏 Посмотреть все буквы</button>
+    <button class="btn small" id="btn-settings">⚙️ Настройки</button>
+  </div>
+
+  <p class="hint">Сначала вспоминаешь ответ, потом открываешь его одним нажатием и отмечаешь «правильно / неправильно».</p>
+
+  <footer class="letters-strip" id="home-strip"></footer>
+</section>
+
+<!-- ====== ЗАПИСЬ НОВОГО УПРАЖНЕНИЯ ====== -->
+<section class="screen" id="scr-start">
+  <button class="back" id="btn-back-start">← Назад</button>
+  <h2 id="start-title">Новое занятие</h2>
+  <p class="sub" id="start-date"></p>
+
+  <div class="card letters-card">
+    <h3>Буквы в упражнении:</h3>
+    <div class="chips" id="start-letters"></div>
+  </div>
+
+  <button class="btn big green" id="btn-go">▶ Начать</button>
+  <p class="hint" id="start-hint"></p>
+</section>
+
+<!-- ====== КАРТОЧКА: ЗАДАНИЕ + СКРЫТЫЙ ОТВЕТ ====== -->
+<section class="screen" id="scr-card">
+  <div class="ex-top">
+    <button class="icon-btn" id="btn-exit" title="Закончить">✕</button>
+    <div class="progress"><div class="progress-fill" id="ex-progress"></div></div>
+    <span class="counter" id="ex-counter"></span>
+  </div>
+
+  <div class="card2 closed" id="card">
+    <div class="half half-quest" id="card-quest"></div>
+    <div class="half half-answer" id="card-answer"></div>
+  </div>
+
+  <div class="actions" id="card-actions">
+    <button class="btn correct big" id="btn-correct" disabled>✔ Правильно</button>
+    <button class="btn wrong big"   id="btn-wrong" disabled>✖ Неправильно</button>
+  </div>
+  <div class="actions single">
+    <button class="btn big yellow" id="btn-show">Показать ответ 👀</button>
+    <button class="btn big blue"   id="btn-next-card" hidden>Следующая карточка →</button>
+  </div>
+  <p class="hint">Нажми на половину с 🎁 (или «Показать ответ»), чтобы открыть ответ.</p>
+</section>
+
+<!-- ====== РЕЗУЛЬТАТЫ ====== -->
+<section class="screen" id="scr-result">
+  <div class="result-card">
+    <div class="big-emoji" id="res-emoji"></div>
+    <h2 id="res-title"></h2>
+    <p class="sub" id="res-sub"></p>
+    <div class="chips" id="res-mistakes"></div>
+    <div class="col-buttons">
+      <button class="btn big blue"   id="btn-again">▶ Ещё раз те же буквы</button>
+      <button class="btn big green"  id="btn-new">📚 Новое упражнение</button>
+      <button class="btn"            id="btn-home1">🏠 На главную</button>
+    </div>
+  </div>
+</section>
+
+<!-- ====== ПРОСМОТР ВСЕХ БУКВ (без статистики) ====== -->
+<section class="screen" id="scr-browse">
+  <div class="ex-top">
+    <button class="icon-btn" id="btn-b-exit" title="Закончить">✕</button>
+    <span class="counter" id="b-counter"></span>
+  </div>
+
+  <div class="card2 closed" id="b-card">
+    <div class="half half-quest" id="b-quest"></div>
+    <div class="half half-answer" id="b-answer"></div>
+  </div>
+
+  <div class="ss-nav">
+    <button class="btn" id="btn-b-prev">←</button>
+    <button class="btn big yellow" id="btn-show2">Показать ответ 👀</button>
+    <button class="btn" id="btn-b-next">→</button>
+  </div>
+  <p class="hint">Это просто просмотр: статистика не меняется.</p>
+</section>
+
+<!-- ====== НАСТРОЙКИ ====== -->
+<section class="screen" id="scr-settings">
+  <button class="back" id="btn-back-settings">← Назад</button>
+  <h2>Настройки</h2>
+  <div class="card">
+    <label class="row"><span>Звук</span>
+      <select id="set-sound"><option value="1">Включён</option><option value="0">Выключен</option></select>
+    </label>
+    <label class="row"><span>Голос</span><select id="set-voice"></select></label>
+    <label class="row"><span>Скорость речи</span>
+      <select id="set-rate">
+        <option value="0.6">Очень медленно</option>
+        <option value="0.75">Медленно</option>
+        <option value="0.9" selected>Обычно</option>
+        <option value="1.1">Быстро</option>
+      </select>
+    </label>
+  </div>
+  <div class="card">
+    <h3>Данные</h3>
+    <div class="row-buttons">
+      <button class="btn" id="btn-export">💾 Скачать файл</button>
+      <label class="btn" id="btn-import">📂 Загрузить файл<input type="file" id="import-file" accept=".json,application/json" hidden></label>
+    </div>
+    <button class="btn danger" id="btn-reset">🗑 Сбросить весь прогресс</button>
+  </div>
+</section>
+
+<script src="letters.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
